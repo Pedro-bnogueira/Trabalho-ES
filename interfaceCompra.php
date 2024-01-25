@@ -114,14 +114,15 @@
             // Obtém a categoria do usuário a partir da sessão
             if (isset($_SESSION["usuario"])) {
                 $categoriaUsuario = $_SESSION["usuario"]->getCategoria();
+                $user = $_SESSION["usuario"];
 
                 // Agora você pode comparar $categoriaUsuario com $categoria
-                if ($categoriaUsuario != $categoria) {
+                if ($categoriaUsuario != $categoria && $categoria != 'padrao') {
                     $mensagem = "Você não pode comprar tickets dessa categoria!";
                 } else {
                     // Prossiga com a compra
                     // Redireciona para interface2.php com os valores necessários
-                    header("Location: /es/trabalho-final/interface2.php?tipo=$tipo&categoria=$categoria&quantidade=$quantidade");
+                    header("Location: /es/trabalho-final/interfaceConfirmacao.php?tipo=$tipo&categoria=$categoria&quantidade=$quantidade");
                     exit(); // Certifica-se de que a execução do script é encerrada após o redirecionamento
                 }
             } else {
@@ -140,17 +141,17 @@
     <input type="hidden" name="form_submitted" value="1">
 
     Tipo:<font color="#AA0000">*</font>
-    <input type="radio" name="tipo" value="individual">Individual
-    <input type="radio" name="tipo" value="multiplo">Múltiplo
-    <input type="radio" name="tipo" value="integrado">Integrado <br><br>
+    <input type="radio" name="tipo" value="individual" title="Selecione uma opção" required>Individual
+    <input type="radio" name="tipo" value="multiplo" title="Selecione uma opção" required>Múltiplo
+    <input type="radio" name="tipo" value="integrado" title="Selecione uma opção" required>Integrado <br><br>
     Categoria:<font color="#AA0000">*</font>
-    <input type="radio" name="categoria" value="padrao">Padrão
-    <input type="radio" name="categoria" value="estudante">Estudante
-    <input type="radio" name="categoria" value="profissional">Profissional
-    <input type="radio" name="categoria" value="idoso">Idoso <br><br>
+    <input type="radio" name="categoria" value="padrao" title="Selecione uma opção" required>Padrão
+    <input type="radio" name="categoria" value="estudante" title="Selecione uma opção" required>Estudante
+    <input type="radio" name="categoria" value="profissional" title="Selecione uma opção" required>Profissional
+    <input type="radio" name="categoria" value="idoso" title="Selecione uma opção" required>Idoso <br><br>
     Quantidade:<font color="#AA0000">*</font> <input type="text" name="quantidade" pattern="[0-9]+" title="Digite apenas números" required> <br><br>
     <input type="submit" value="Avançar"><br> <br>
-    Mensagem1: <font color="#AA0000"><?php echo $mensagem;?></font><br> <br>
+    Mensagem: <font color="#AA0000"><?php echo $mensagem;?></font><br> <br>
 
 </form>
 </body>

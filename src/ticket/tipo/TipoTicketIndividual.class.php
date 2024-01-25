@@ -3,7 +3,7 @@
 class TipoTicketIndividual extends TipoTicket {
 
     public function getPreco(): float {
-        return 20.0;
+        return 5.0;
     }
 
 }

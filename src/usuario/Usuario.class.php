@@ -64,4 +64,35 @@ class Usuario {
     public function adicionarSaldo($quantia) {
         $this->saldo += $quantia;
     }
+
+    // * Banco de dados
+    public function save($quantidade) {
+        $conn = Connection::getInstance();
+        
+        if (!$conn) {
+            $mensagem = 'Problemas na conexão!!';
+        } else {
+            // Verifica se já existe um registro com o nome selecionado
+            $checkSql = "SELECT * FROM Usuario WHERE nome = '" . $this->getNome() . "'";
+            $result = mysqli_query($conn, $checkSql);
+    
+            if (!$result) {
+                $mensagem = 'Erro ao verificar o registro existente: ' . mysqli_error($conn);
+            } else {
+                // Se já existir um registro com o nome do usuário selecionado, realiza o UPDATE
+                if (mysqli_num_rows($result) > 0) {
+                    $updateSql = "UPDATE Usuario SET qtd_tickets = '" . $quantidade . "' WHERE nome = '" . $this->getNome() . "'";
+    
+                    if (mysqli_query($conn, $updateSql)) {
+                        $mensagem = "Dados atualizados para o usuário '" . $this->getNome() . "'";
+                    } else {
+                        $mensagem = 'Erro ao atualizar dados: ' . mysqli_error($conn);
+                    }
+                } else {
+                    $mensagem = "Não foi encontrado nenhum registro com o nome '" . $this->getNome() . "'";
+                }
+            }
+        }
+        return $mensagem;
+    }
 }

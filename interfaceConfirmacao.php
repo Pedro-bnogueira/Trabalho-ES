@@ -1,7 +1,5 @@
 <?php
 
-session_start(); // Inicia ou resume a sessão
-
     // * Habilitar o MyAutoload
     function MyTipoAutoload($className) { // carrega as classes da pasta tipo
         $extension = '.class.php';
@@ -43,13 +41,24 @@ session_start(); // Inicia ou resume a sessão
         }
     }
 
+    function MyConnectionAutoload($className) { // carrega as classes da pasta usuario
+        $extension = '.class.php';
+        $className = str_replace('\\', DIRECTORY_SEPARATOR, $className);
+        $filePath = __DIR__ . '/src/conexao-bd' . $className . $extension;
+
+        if (file_exists($filePath)) {
+            require_once($filePath);
+        }
+    }
+
     spl_autoload_register('MyTipoAutoload');
     spl_autoload_register('MyCategoriaAutoload');
     spl_autoload_register('MyTicketAutoload');
     spl_autoload_register('MyUsuarioAutoload');
+    spl_autoload_register('MyConnectionAutoload');
 
     // * Variáveis
-    $tipo = $categoria = $quantidade = $mensagem = "";
+    $tipo = $categoria = $quantidade = $mensagem = $usuario = "";
 
     // Verifica se as variáveis estão definidas na URL
     if (isset($_GET['tipo']) && isset($_GET['categoria']) && isset($_GET['quantidade'])) {
@@ -57,6 +66,7 @@ session_start(); // Inicia ou resume a sessão
         $tipo = $_GET['tipo'];
         $categoria = $_GET['categoria'];
         $quantidade = $_GET['quantidade'];
+        $usuario = $_SESSION["usuario"];
     }
 
     // Criacao do Tipo do Ticket com base no que foi selecionado em interface
@@ -102,27 +112,12 @@ session_start(); // Inicia ou resume a sessão
 
     $ticket = new Ticket($tipoTicket, $categoriaTicket);
 
-    // Verifica se o formulário foi enviado
-    if ($_SERVER["REQUEST_METHOD"] == "POST") {
-        $mensagem = "teste";
-        // // Se o botão "Cancelar" foi clicado, voltar para a compra
-        // if (isset($_POST["cancelar"])) {
-        //     header("Location: /es/trabalho-final/interfaceUsuario.php");
-        //     exit();
-        // }
-
-        // // Se o botão "Confirmar" foi clicado, mostrar uma confirmacao
-        // if (isset($_POST["confirmar"])) {
-        //     $mensagem = "Compra confirmada com sucesso!";
-        // }
-    }
+    // $mensagem = $usuario->getNome(); 
 ?>
 
 <html>
 <body>
 <h1>Confirmação de compra</h1>
-
-    <input type="hidden" name="form_submitted" value="1">
 
     <font color="#AA0000"> Resumo do Pedido: <br><br><br> </font>   
         Tipo do ticket: <?php echo $ticket->getTipo();?><br><br>
@@ -131,11 +126,13 @@ session_start(); // Inicia ou resume a sessão
         Preço Final: R$ <?php echo ($quantidade * $ticket->getValor());?><br><br> <br><br>
 
     <!-- Botões de Ação -->
-    <button onclick="cancelar()">Cancelar</button>
-    <button onclick="confirmar()">Confirmar</button>
+    <button id="cancelarBtn" onclick="cancelar()" >Cancelar</button>
+    <button id="confirmarBtn" onclick="confirmar()" >Confirmar</button>
 
     <!-- Exibição da Mensagem -->
     <p id="mensagem" style="color: #008000;"><?php echo $mensagem;?></p>
+
+    Mensagem: <font color="#AA0000"><?php echo $mensagem;?></font><br> <br>
 
     <script>
         function cancelar() {
@@ -146,10 +143,17 @@ session_start(); // Inicia ou resume a sessão
         function confirmar() {
             // Exibe a mensagem de confirmação
             document.getElementById("mensagem").innerText = "Compra confirmada com sucesso!";
+
+            // Desabilita os botões após a confirmação
+            document.getElementById("cancelarBtn").disabled = true;
+            document.getElementById("confirmarBtn").disabled = true;
+
+            // Redireciona para a próxima página após 5 segundos
+            setTimeout(function() {
+                window.location.href = '/es/trabalho-final/interfaceUsuario.php';
+            }, 5000); // Tempo em milissegundos (5 segundos neste exemplo)
         }
     </script>
-    
-    <!-- Mensagem: <font color="#008000"><?php echo $mensagem;?></font><br> <br> -->
 
 </body>
 </html>
