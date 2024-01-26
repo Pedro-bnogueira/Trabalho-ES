@@ -1,159 +1,163 @@
-<?php
+        <?php
 
-    // * Habilitar o MyAutoload
-    function MyTipoAutoload($className) { // carrega as classes da pasta tipo
-        $extension = '.class.php';
-        $className = str_replace('\\', DIRECTORY_SEPARATOR, $className);
-        $filePath = __DIR__ . '/src/ticket/tipo/' . $className . $extension;
+            // * Habilitar o MyAutoload
+            function MyTipoAutoload($className) { // carrega as classes da pasta tipo
+                $extension = '.class.php';
+                $className = str_replace('\\', DIRECTORY_SEPARATOR, $className);
+                $filePath = __DIR__ . '/src/ticket/tipo/' . $className . $extension;
 
-        if (file_exists($filePath)) {
-            require_once($filePath);
-        }
-    }
+                if (file_exists($filePath)) {
+                    require_once($filePath);
+                }
+            }
 
-    function MyCategoriaAutoload($className) { // carrega as classes da pasta categoria
-        $extension = '.class.php';
-        $className = str_replace('\\', DIRECTORY_SEPARATOR, $className);
-        $filePath = __DIR__ . '/src/ticket/categoria/' . $className . $extension;
+            function MyCategoriaAutoload($className) { // carrega as classes da pasta categoria
+                $extension = '.class.php';
+                $className = str_replace('\\', DIRECTORY_SEPARATOR, $className);
+                $filePath = __DIR__ . '/src/ticket/categoria/' . $className . $extension;
 
-        if (file_exists($filePath)) {
-            require_once($filePath);
-        }
-    }
+                if (file_exists($filePath)) {
+                    require_once($filePath);
+                }
+            }
 
-    function MyTicketAutoload($className) { // carrega as classes da pasta ticket
-        $extension = '.class.php';
-        $className = str_replace('\\', DIRECTORY_SEPARATOR, $className);
-        $filePath = __DIR__ . '/src/ticket/' . $className . $extension;
+            function MyTicketAutoload($className) { // carrega as classes da pasta ticket
+                $extension = '.class.php';
+                $className = str_replace('\\', DIRECTORY_SEPARATOR, $className);
+                $filePath = __DIR__ . '/src/ticket/' . $className . $extension;
 
-        if (file_exists($filePath)) {
-            require_once($filePath);
-        }
-    }
+                if (file_exists($filePath)) {
+                    require_once($filePath);
+                }
+            }
 
-    function MyUsuarioAutoload($className) { // carrega as classes da pasta usuario
-        $extension = '.class.php';
-        $className = str_replace('\\', DIRECTORY_SEPARATOR, $className);
-        $filePath = __DIR__ . '/src/usuario/' . $className . $extension;
+            function MyUsuarioAutoload($className) { // carrega as classes da pasta usuario
+                $extension = '.class.php';
+                $className = str_replace('\\', DIRECTORY_SEPARATOR, $className);
+                $filePath = __DIR__ . '/src/usuario/' . $className . $extension;
 
-        if (file_exists($filePath)) {
-            require_once($filePath);
-        }
-    }
+                if (file_exists($filePath)) {
+                    require_once($filePath);
+                }
+            }
 
-    function MyConnectionAutoload($className) { // carrega as classes da pasta usuario
-        $extension = '.class.php';
-        $className = str_replace('\\', DIRECTORY_SEPARATOR, $className);
-        $filePath = __DIR__ . '/src/conexao-bd' . $className . $extension;
+            function MyConnectionAutoload($className) { // carrega as classes da pasta usuario
+                $extension = '.class.php';
+                $className = str_replace('\\', DIRECTORY_SEPARATOR, $className);
+                $filePath = __DIR__ . '/src/conexao-bd' . $className . $extension;
 
-        if (file_exists($filePath)) {
-            require_once($filePath);
-        }
-    }
+                if (file_exists($filePath)) {
+                    require_once($filePath);
+                }
+            }
 
-    spl_autoload_register('MyTipoAutoload');
-    spl_autoload_register('MyCategoriaAutoload');
-    spl_autoload_register('MyTicketAutoload');
-    spl_autoload_register('MyUsuarioAutoload');
-    spl_autoload_register('MyConnectionAutoload');
+            spl_autoload_register('MyTipoAutoload');
+            spl_autoload_register('MyCategoriaAutoload');
+            spl_autoload_register('MyTicketAutoload');
+            spl_autoload_register('MyUsuarioAutoload');
+            spl_autoload_register('MyConnectionAutoload');
 
-    // * Variáveis
-    $tipo = $categoria = $quantidade = $mensagem = $usuario = "";
+            // * Variáveis
+            $tipo = $categoria = $quantidade = $mensagem = $usuario = "";
 
-    // Verifica se as variáveis estão definidas na URL
-    if (isset($_GET['tipo']) && isset($_GET['categoria']) && isset($_GET['quantidade'])) {
-        // Recupera os valores
-        $tipo = $_GET['tipo'];
-        $categoria = $_GET['categoria'];
-        $quantidade = $_GET['quantidade'];
-        $usuario = $_SESSION["usuario"];
-    }
+            // Verifica se as variáveis estão definidas na URL
+            if (isset($_GET['tipo']) && isset($_GET['categoria']) && isset($_GET['quantidade'])) {
+                // Recupera os valores
+                $tipo = $_GET['tipo'];
+                $categoria = $_GET['categoria'];
+                $quantidade = $_GET['quantidade'];
 
-    // Criacao do Tipo do Ticket com base no que foi selecionado em interface
-    switch ($tipo) {
-        case "integral":
-            $tipoTicket = new Tipo("integrado", new TipoTicketIntegrado());
-            break;
-        case "multiplo":
-            $tipoTicket = new Tipo("multiplo", new TipoTicketMultiplo());
-            break;
-        case "individual":
-            $tipoTicket = new Tipo("individual", new TipoTicketIndividual());
-            break;
-        default:
-            // Trate outros casos conforme necessário
-            break;
-    }
+                // Carrega a classe do usuário (ajuste o caminho conforme necessário)
+                require_once(__DIR__ . '/src/usuario/Usuario.class.php');
 
-    // Criacao da Categoria com base no que foi selecionado em interface
-    switch ($categoria) {
-        case "padrao":
-            $categoriaTicket = new Categoria("padrao", new DescontoPadrao());
-            break;
-        case "estudante":
-            $categoriaTicket = new Categoria("estudante", new DescontoEstudante());
-            break;
-        case "profissional":
-            $categoriaTicket = new Categoria("profissional", new DescontoProfissional());
-            break;
-        case "idoso":
-            $categoriaTicket = new Categoria("idoso", new DescontoIdoso());
-        default:
-            // Trate outros casos conforme necessário
-            break;
-    }
+                // Recupera a string serializada do usuário da requisição
+                $usuario_serialized = $_GET['usuario_serialized'];
 
-    function test_input($data) {
-        $data = trim ($data);
-        $data = stripslashes ($data);
-        $data = htmlspecialchars ($data);
-        return $data;
-    }
+                // Desserializa a string para obter o objeto original
+                $usuario = unserialize(urldecode($usuario_serialized));
+            }
 
-    $ticket = new Ticket($tipoTicket, $categoriaTicket);
+            // Criacao do Tipo do Ticket com base no que foi selecionado em interface
+            switch ($tipo) {
+                case "integral":
+                    $tipoTicket = new Tipo("integrado", new TipoTicketIntegrado());
+                    break;
+                case "multiplo":
+                    $tipoTicket = new Tipo("multiplo", new TipoTicketMultiplo());
+                    break;
+                case "individual":
+                    $tipoTicket = new Tipo("individual", new TipoTicketIndividual());
+                    break;
+                default:
+                    // Trate outros casos conforme necessário
+                    break;
+            }
 
-    // $mensagem = $usuario->getNome(); 
-?>
+            // Criacao da Categoria com base no que foi selecionado em interface
+            switch ($categoria) {
+                case "padrao":
+                    $categoriaTicket = new Categoria("padrao", new DescontoPadrao());
+                    break;
+                case "estudante":
+                    $categoriaTicket = new Categoria("estudante", new DescontoEstudante());
+                    break;
+                case "profissional":
+                    $categoriaTicket = new Categoria("profissional", new DescontoProfissional());
+                    break;
+                case "idoso":
+                    $categoriaTicket = new Categoria("idoso", new DescontoIdoso());
+                default:
+                    // Trate outros casos conforme necessário
+                    break;
+            }
 
-<html>
-<body>
-<h1>Confirmação de compra</h1>
+            function test_input($data) {
+                $data = trim ($data);
+                $data = stripslashes ($data);
+                $data = htmlspecialchars ($data);
+                return $data;
+            }
 
-    <font color="#AA0000"> Resumo do Pedido: <br><br><br> </font>   
-        Tipo do ticket: <?php echo $ticket->getTipo();?><br><br>
-        Categoria do ticket: <?php echo $ticket->getCategoria();?><br><br>
-        Quantidade: <?php echo $quantidade;?><br><br>
-        Preço Final: R$ <?php echo ($quantidade * $ticket->getValor());?><br><br> <br><br>
+            $ticket = new Ticket($tipoTicket, $categoriaTicket);
 
-    <!-- Botões de Ação -->
-    <button id="cancelarBtn" onclick="cancelar()" >Cancelar</button>
-    <button id="confirmarBtn" onclick="confirmar()" >Confirmar</button>
+            // $mensagem = $usuario->getNome(); 
 
-    <!-- Exibição da Mensagem -->
-    <p id="mensagem" style="color: #008000;"><?php echo $mensagem;?></p>
+            // Verifica se a solicitação foi feita via POST
+            session_start(); // Inicia ou resume a sessão
 
-    Mensagem: <font color="#AA0000"><?php echo $mensagem;?></font><br> <br>
+            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                
 
-    <script>
-        function cancelar() {
-            // Redireciona o usuário
-            window.location.href = '/es/trabalho-final/interfaceUsuario.php';
-        }
+                // Chama o método save() do objeto $usuario
+                $mensagem = $usuario->save($quantidade);
 
-        function confirmar() {
-            // Exibe a mensagem de confirmação
-            document.getElementById("mensagem").innerText = "Compra confirmada com sucesso!";
+                // Redireciona de volta para a página original com os parâmetros
+                header("Location: /es/trabalho-final/mensagem.php?mensagem=$mensagem");
 
-            // Desabilita os botões após a confirmação
-            document.getElementById("cancelarBtn").disabled = true;
-            document.getElementById("confirmarBtn").disabled = true;
+                exit();
+            } 
+        ?>
 
-            // Redireciona para a próxima página após 5 segundos
-            setTimeout(function() {
-                window.location.href = '/es/trabalho-final/interfaceUsuario.php';
-            }, 5000); // Tempo em milissegundos (5 segundos neste exemplo)
-        }
-    </script>
+        <html>
+        <body>
+        <h1>Confirmação de compra</h1>
+            <form id="formConfirmacao" method="post">
+                <font color="#AA0000"> Resumo do Pedido: <br><br><br> </font>   
+                    Tipo do ticket: <?php echo $ticket->getTipo();?><br><br>
+                    Categoria do ticket: <?php echo $ticket->getCategoria();?><br><br>
+                    Quantidade: <?php echo $quantidade;?><br><br>
+                    Preço Final: R$ <?php echo ($quantidade);?><br><br> <br><br>
 
-</body>
-</html>
+                <!-- Botões de Ação -->
+                <button id="cancelarBtn" onclick="cancelar()" type="button">Cancelar</button>
+                <input id="confirmarBtn" type="submit">Confirmar</input>
+
+                <!-- Exibição da Mensagem -->
+                <p id="mensagem" style="color: #008000;"><?php echo $mensagem;?></p>
+
+                Mensagem: <font color="#AA0000"><?php echo $mensagem;?></font><br> <br>
+
+            </form>
+
+        </body>
+        </html>

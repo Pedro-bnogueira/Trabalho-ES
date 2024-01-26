@@ -49,26 +49,60 @@
 
     $tipo = $categoria = $quantidade = $mensagem = "";
     $usuario = "";
-    $tipoUsuario = $_POST["user"];
-
+    
     // * Usuario
+    
+    function loadOne($nomeUsuario) {
+        $conn = Connection::getInstance();
+    
+        if (!$conn) {
+            return 'Problemas na conexão!!';
+        } else {
+            $selectSql = "SELECT * FROM Usuario WHERE nome = '" . $nomeUsuario . "'";
+            $result = mysqli_query($conn, $selectSql);
+    
+            if (!$result) {
+                return 'Erro ao recuperar dados: ' . mysqli_error($conn);
+            } else {
+                // Verifica se encontrou algum registro com o ID fornecido
+                if (mysqli_num_rows($result) > 0) {
+                    $row = mysqli_fetch_array($result, MYSQLI_ASSOC);
 
-    switch ($tipoUsuario) { // criacao do objeto de usuario de acordo com a resposta de interfaceUsuario
-        case "estudante":
-            $usuario = new Usuario("Pedro", "111.111.111-11", 0, new Categoria("estudante", new DescontoEstudante()));
-            break;
-        case "profissional":
-            $usuario = new Usuario("Rafael", "222.222.222-22", 0, new Categoria("profissional", new DescontoProfissional()));
-            break;
-        case "padrao":
-            $usuario = new Usuario("João", "333.333.333-33", 0, new Categoria("padrao", new DescontoPadrao()));
-            break;
-        case "idoso":
-            $usuario = new Usuario("José", "444.444.444-44", 0, new Categoria("idoso", new DescontoIdoso()));
-            break;
-        default:
-            break;
+                    switch ($row['categoria']) { 
+                        case "Estudante":
+                            $desconto = new DescontoEstudante();
+                            break;
+                        case "Profissional":
+                            $desconto =new DescontoProfissional();
+                            break;
+                        case "Padrao":
+                            $desconto = new DescontoPadrao();
+                            break;
+                        case "Idoso":
+                            $desconto = new DescontoIdoso();
+                            break;
+                        default:
+                            break;
+                    }
+    
+                    // Cria um novo objeto Usuario e preenche com os dados recuperados
+                    $usuario = new Usuario(
+                        $row['nome'],
+                        $row['cpf'],
+                        $row['saldo'],
+                        new Categoria($row['categoria'], $desconto)
+                    );
+    
+                    return $usuario;
+                } else {
+                    return "Não foi encontrado nenhum usuário com o Nome '" . $nomeUsuario . "'";
+                }
+            }
+        }
     }
+
+    $mensagem = $_POST["user"];
+            
 
     // * Validacoes
     function test_input($data) {
@@ -85,25 +119,10 @@
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // Verifica se o campo "user" foi enviado no formulário anterior
         if (isset($_POST["user"])) {
-            $tipoUsuario = $_POST["user"];
-
-            switch ($tipoUsuario) {
-                case "estudante":
-                    $_SESSION["usuario"] = new Usuario("Pedro", "111.111.111-11", 0, new Categoria("estudante", new DescontoEstudante()));
-                    break;
-                case "profissional":
-                    $_SESSION["usuario"] = new Usuario("Rafael", "222.222.222-22", 0, new Categoria("profissional", new DescontoProfissional()));
-                    break;
-                case "padrao":
-                    $_SESSION["usuario"] = new Usuario("João", "333.333.333-33", 0, new Categoria("padrao", new DescontoPadrao()));
-                    break;
-                case "idoso":
-                    $_SESSION["usuario"] = new Usuario("José", "444.444.444-44", 0, new Categoria("idoso", new DescontoIdoso()));
-                    break;
-                default:
-                    break;
-            }
+            $nomeUsuario = $_POST["user"];
+            $_SESSION["usuario"] = loadOne($nomeUsuario);            
         }
+        
 
         // Verifica se os campos foram enviados no formulário atual
         if (isset($_POST["tipo"]) && isset($_POST["categoria"]) && isset($_POST["quantidade"])) {
@@ -114,15 +133,17 @@
             // Obtém a categoria do usuário a partir da sessão
             if (isset($_SESSION["usuario"])) {
                 $categoriaUsuario = $_SESSION["usuario"]->getCategoria();
-                $user = $_SESSION["usuario"];
+                // Serializa o objeto para uma string
+                $usuario_serialized = serialize($_SESSION["usuario"]);
 
                 // Agora você pode comparar $categoriaUsuario com $categoria
                 if ($categoriaUsuario != $categoria && $categoria != 'padrao') {
                     $mensagem = "Você não pode comprar tickets dessa categoria!";
                 } else {
+                    session_write_close(); // Fecha a sessão
                     // Prossiga com a compra
                     // Redireciona para interface2.php com os valores necessários
-                    header("Location: /es/trabalho-final/interfaceConfirmacao.php?tipo=$tipo&categoria=$categoria&quantidade=$quantidade");
+                    header("Location: /es/trabalho-final/interfaceConfirmacao.php?tipo=$tipo&categoria=$categoria&quantidade=$quantidade&usuario_serialized=" . urlencode($usuario_serialized));
                     exit(); // Certifica-se de que a execução do script é encerrada após o redirecionamento
                 }
             } else {
