@@ -23,6 +23,15 @@ class Usuario {
         return $this->categoria->getNome();
     }
 
+    public function getSaldo() {
+        return $this->saldo;
+    }
+
+    // * Setter
+    public function setSaldo($saldo) {
+        $this->saldo = $saldo;
+    }
+
     // * Funcoes de tickets
     public function adicionarTicket(Ticket $ticket) {
         $this->tickets[] = $ticket;
@@ -81,7 +90,7 @@ class Usuario {
             } else {
                 // Se já existir um registro com o nome do usuário selecionado, realiza o UPDATE
                 if (mysqli_num_rows($result) > 0) {
-                    $updateSql = "UPDATE Usuario SET qtd_tickets = '" . $quantidade . "' WHERE nome = '" . $this->getNome() . "'";
+                    $updateSql = "UPDATE Usuario SET qtd_tickets = qtd_tickets + '" . $quantidade . "' WHERE nome = '" . $this->getNome() . "'";
     
                     if (mysqli_query($conn, $updateSql)) {
                         $mensagem = "Dados atualizados para o usuário '" . $this->getNome() . "'";

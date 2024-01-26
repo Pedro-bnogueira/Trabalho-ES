@@ -79,7 +79,7 @@
 
             // Criacao do Tipo do Ticket com base no que foi selecionado em interface
             switch ($tipo) {
-                case "integral":
+                case "integrado":
                     $tipoTicket = new Tipo("integrado", new TipoTicketIntegrado());
                     break;
                 case "multiplo":
@@ -119,21 +119,28 @@
 
             $ticket = new Ticket($tipoTicket, $categoriaTicket);
 
+            
             // $mensagem = $usuario->getNome(); 
-
+            
             // Verifica se a solicitação foi feita via POST
             session_start(); // Inicia ou resume a sessão
-
+            
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                if($usuario->getSaldo() >= ($ticket->getValor() * $quantidade)){
+                    $usuario->setSaldo($usuario->getSaldo() - ($ticket->getValor() * $quantidade));
+                    $usuario->adicionarTicket($ticket);
+                    
+                    // Chama o método save() do objeto $usuario
+                    $mensagem = $usuario->save($quantidade);
+
+                    // Redireciona de volta para a página original com os parâmetros
+                    header("Location: /es/trabalho-final/mensagem.php?mensagem=$mensagem");
+
+                    exit();
+                } else {
+                    $mensagem = "Você não possui saldo suficiente para efetuar essa compra!";
+                }
                 
-
-                // Chama o método save() do objeto $usuario
-                $mensagem = $usuario->save($quantidade);
-
-                // Redireciona de volta para a página original com os parâmetros
-                header("Location: /es/trabalho-final/mensagem.php?mensagem=$mensagem");
-
-                exit();
             } 
         ?>
 
@@ -145,14 +152,13 @@
                     Tipo do ticket: <?php echo $ticket->getTipo();?><br><br>
                     Categoria do ticket: <?php echo $ticket->getCategoria();?><br><br>
                     Quantidade: <?php echo $quantidade;?><br><br>
-                    Preço Final: R$ <?php echo ($quantidade);?><br><br> <br><br>
+                    Preço Final: R$ <?php echo ($ticket->getValor() * $quantidade);?><br><br> <br><br>
 
                 <!-- Botões de Ação -->
-                <button id="cancelarBtn" onclick="cancelar()" type="button">Cancelar</button>
-                <input id="confirmarBtn" type="submit">Confirmar</input>
+                <a href="http://localhost/es/trabalho-final/interfaceUsuario.php"><button id="cancelarBtn"type="button">Cancelar</button></a>
+                <input id="confirmarBtn" type="submit" value="Confirmar"> <br><br>
 
                 <!-- Exibição da Mensagem -->
-                <p id="mensagem" style="color: #008000;"><?php echo $mensagem;?></p>
 
                 Mensagem: <font color="#AA0000"><?php echo $mensagem;?></font><br> <br>
 

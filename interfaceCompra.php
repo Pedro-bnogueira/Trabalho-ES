@@ -137,7 +137,7 @@
                 $usuario_serialized = serialize($_SESSION["usuario"]);
 
                 // Agora você pode comparar $categoriaUsuario com $categoria
-                if ($categoriaUsuario != $categoria && $categoria != 'padrao') {
+                if ($categoriaUsuario != $categoria && $categoria != 'Padrao') {
                     $mensagem = "Você não pode comprar tickets dessa categoria!";
                 } else {
                     session_write_close(); // Fecha a sessão
