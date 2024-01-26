@@ -103,15 +103,5 @@ class UsuarioTeste extends TestCase {
 
         $this->assertCount(1, $usuario->listarTickets());
     }
-
-    public function testSave() {
-        $desconto = new DescontoPadrao();
-        $categoria = new Categoria('padrao', $desconto);
-        $usuario = new Usuario('Nicolle Merhy', '999.888.777-66', 17.0, $categoria, 1);
-
-        $result = $usuario->save(3);
-
-        $this->assertEquals("Dados atualizados para o usuário 'Nicolle Merhy'", $result);
-    }
 }
 

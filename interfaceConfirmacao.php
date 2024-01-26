@@ -118,6 +118,7 @@
                     // Define o novo saldo do usuário descontando o valor da compra atual
                     $usuario->setSaldo($usuario->getSaldo() - ($ticket->getValor() * $quantidade));
                     $usuario->adicionarTicket($ticket);
+                    $usuario->save($quantidade, $usuario->getSaldo());
                     
                     // Salva os dados da compra no banco de dados relativo ao usuário específico
                     $mensagem = 'Seu saldo foi atulizado e agora é de: R$' . $usuario->getSaldo();

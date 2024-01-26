@@ -52,7 +52,7 @@ class Usuario {
     }
 
     // * Banco de dados
-    public function save($quantidade) {
+    public function save($quantidade, $saldo) {
         $conn = Connection::getInstance();
         
         if (!$conn) {
@@ -67,7 +67,7 @@ class Usuario {
             } else {
                 // Se já existir um registro com o nome do usuário selecionado, realiza o UPDATE
                 if (mysqli_num_rows($result) > 0) {
-                    $updateSql = "UPDATE Usuario SET qtd_tickets = qtd_tickets + '" . $quantidade . "' WHERE nome = '" . $this->getNome() . "'";
+                    $updateSql = "UPDATE Usuario SET qtd_tickets = qtd_tickets + '" . $quantidade . "', saldo = '" . $saldo . "' WHERE nome = '" . $this->getNome() . "'";
     
                     if (mysqli_query($conn, $updateSql)) {
                         $mensagem = "Dados atualizados para o usuário '" . $this->getNome() . "'";

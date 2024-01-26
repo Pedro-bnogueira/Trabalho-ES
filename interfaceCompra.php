@@ -1,4 +1,5 @@
 <?php
+
     // * Habilitar o MyAutoload
     function MyTipoAutoload($className) { // carrega as classes da pasta tipo
         $extension = '.class.php';
@@ -105,13 +106,30 @@
      
     $infoUsuario = loadOne($_POST["user"]);
 
+    $mensagemAlerta1 = alerta($infoUsuario);
+    $mensagemAlerta2 = categoria($infoUsuario);
+
     // * Alerta
 
     function alerta($infoUsuario) {
-        if ($infoUsuario->getQtdeTickets() > 1) {
-            return 'Quantidade atual de tickets: ' . $infoUsuario->getQtdeTickets() . '<br><br>';
+        if($infoUsuario instanceof Usuario) {
+            if ($infoUsuario->getQtdeTickets() > 1) {
+                return 'Quantidade atual de tickets: ' . $infoUsuario->getQtdeTickets() . '<br><br>';
+            } else {
+                return 'Atenção! Você possui ' . $infoUsuario->getQtdeTickets() . ' ticket<br><br>';
+            }
+
         } else {
-            return 'Atenção! Você possui ' . $infoUsuario->getQtdeTickets() . ' ticket<br><br>';
+            return '';
+        }
+    }
+
+    function categoria($infoUsuario) {
+        if($infoUsuario instanceof Usuario) {
+            $infoUsuario->getCategoria();
+            return 'Para o seu usuário é permitido a categoria: '. $infoUsuario->getCategoria() . '<br> <br>';
+        } else {
+            return '';
         }
     }
 
@@ -147,7 +165,7 @@
                 $usuario_serialized = serialize($_SESSION["usuario"]);
 
                 if ($categoriaUsuario != $categoria && $categoria != 'Padrao') {
-                    $mensagem = "Você não pode comprar tickets dessa categoria!";
+                    $mensagem = 'Você não pode comprar tickets dessa categoria!';
                 } else {
                     session_write_close(); // Fecha a sessão
 
@@ -167,13 +185,13 @@
 <body>
 <h1>Compra de Tickets</h1>
 
-<?php echo '<div>' . alerta($infoUsuario) . '</div>'; ?>
 
-(Para o seu usuário é permitido a categoria: <?php echo $infoUsuario->getCategoria() ?>) <br> <br>
-<p><font color="#AA0000">* campos obrigatórios</font></p>
 <form method="post" action="<?php echo $_SERVER["PHP_SELF"]; ?>">
     <input type="hidden" name="form_submitted" value="1">
     
+    <font ><?php echo $mensagemAlerta1;?></font>
+    <font ><?php echo $mensagemAlerta2;?></font>
+    <p><font color="#AA0000">* campos obrigatórios</font></p>
     
     Tipo:<font color="#AA0000">*</font>
     <input type="radio" name="tipo" value="individual" title="Selecione uma opção" required>Individual (R$ 05,00)
