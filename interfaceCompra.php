@@ -166,10 +166,10 @@
     <input type="radio" name="tipo" value="multiplo" title="Selecione uma opção" required>Múltiplo
     <input type="radio" name="tipo" value="integrado" title="Selecione uma opção" required>Integrado <br><br>
     Categoria:<font color="#AA0000">*</font>
-    <input type="radio" name="categoria" value="padrao" title="Selecione uma opção" required>Padrão
-    <input type="radio" name="categoria" value="estudante" title="Selecione uma opção" required>Estudante
-    <input type="radio" name="categoria" value="profissional" title="Selecione uma opção" required>Profissional
-    <input type="radio" name="categoria" value="idoso" title="Selecione uma opção" required>Idoso <br><br>
+    <input type="radio" name="categoria" value="Padrao" title="Selecione uma opção" required>Padrão
+    <input type="radio" name="categoria" value="Estudante" title="Selecione uma opção" required>Estudante
+    <input type="radio" name="categoria" value="Profissional" title="Selecione uma opção" required>Profissional
+    <input type="radio" name="categoria" value="Idoso" title="Selecione uma opção" required>Idoso <br><br>
     Quantidade:<font color="#AA0000">*</font> <input type="text" name="quantidade" pattern="[0-9]+" title="Digite apenas números" required> <br><br>
     <input type="submit" value="Avançar"><br> <br>
     Mensagem: <font color="#AA0000"><?php echo $mensagem;?></font><br> <br>

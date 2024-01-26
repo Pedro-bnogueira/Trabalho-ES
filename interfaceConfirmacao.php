@@ -95,19 +95,18 @@
 
             // Criacao da Categoria com base no que foi selecionado em interface
             switch ($categoria) {
-                case "padrao":
+                case "Padrao":
                     $categoriaTicket = new Categoria("padrao", new DescontoPadrao());
                     break;
-                case "estudante":
+                case "Estudante":
                     $categoriaTicket = new Categoria("estudante", new DescontoEstudante());
                     break;
-                case "profissional":
+                case "Profissional":
                     $categoriaTicket = new Categoria("profissional", new DescontoProfissional());
                     break;
-                case "idoso":
+                case "Idoso":
                     $categoriaTicket = new Categoria("idoso", new DescontoIdoso());
                 default:
-                    // Trate outros casos conforme necessário
                     break;
             }
 
