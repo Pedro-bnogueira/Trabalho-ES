@@ -1,9 +1,9 @@
 <?php
 
 $mensagem = "";
-// Verifica se as variáveis estão definidas na URL
+// Verifica se as variável está vindo da URL
 if (isset($_GET['mensagem'])) {
-    // Recupera os valores
+    // Recupera os valor
     $mensagem = $_GET['mensagem'];
 }
 ?>
@@ -12,7 +12,7 @@ if (isset($_GET['mensagem'])) {
     <body>
     <h1>Sua compra foi confirmada!</h1>
 
-    Mensagem: <font color="#AA0000"><?php echo $mensagem;?></font><br> <br>
+    <font color="#AA0000"><?php echo $mensagem;?></font><br> <br>
 
     </body>
 </html>

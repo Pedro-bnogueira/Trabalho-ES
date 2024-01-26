@@ -47,6 +47,9 @@
     spl_autoload_register('MyUsuarioAutoload');
     spl_autoload_register('MyConnectionAutoload');
 
+    // * Usuários
+
+    // Carrega todos os usuários presente no banco de dados
     function loadAll() {
         $conn = Connection::getInstance();
     
@@ -92,7 +95,8 @@
                         $row['nome'],
                         $row['cpf'],
                         $row['saldo'],
-                        new Categoria($row['categoria'], $desconto)
+                        new Categoria($row['categoria'], $desconto),
+                        $row['qtd_tickets']
                     );
 
                     

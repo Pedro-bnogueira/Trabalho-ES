@@ -49,6 +49,7 @@
 
     $tipo = $categoria = $quantidade = $mensagem = "";
     $usuario = "";
+    $infoUsuario = "";
     
     // * Usuario
     
@@ -90,7 +91,8 @@
                         $row['nome'],
                         $row['cpf'],
                         $row['saldo'],
-                        new Categoria($row['categoria'], $desconto)
+                        new Categoria($row['categoria'], $desconto),
+                        $row['qtd_tickets']
                     );
     
                     return $usuario;
@@ -100,9 +102,18 @@
             }
         }
     }
+     
+    $infoUsuario = loadOne($_POST["user"]);
 
-    $mensagem = $_POST["user"];
-            
+    // * Alerta
+
+    function alerta($infoUsuario) {
+        if ($infoUsuario->getQtdeTickets() > 1) {
+            return 'Quantidade atual de tickets: ' . $infoUsuario->getQtdeTickets() . '<br><br>';
+        } else {
+            return 'Atenção! Você possui ' . $infoUsuario->getQtdeTickets() . ' ticket<br><br>';
+        }
+    }
 
     // * Validacoes
     function test_input($data) {
@@ -112,12 +123,11 @@
         return $data;
     }
 
-
     // * Envio do formulario
     session_start(); // Inicia ou resume a sessão
 
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
-        // Verifica se o campo "user" foi enviado no formulário anterior
+        // Verifica se o input "user" foi enviado do formulário anterior
         if (isset($_POST["user"])) {
             $nomeUsuario = $_POST["user"];
             $_SESSION["usuario"] = loadOne($nomeUsuario);            
@@ -130,24 +140,23 @@
             $categoria = test_input($_POST["categoria"]);
             $quantidade = test_input($_POST["quantidade"]);
 
-            // Obtém a categoria do usuário a partir da sessão
+            // Obtém o usuário a partir da sessão
             if (isset($_SESSION["usuario"])) {
                 $categoriaUsuario = $_SESSION["usuario"]->getCategoria();
                 // Serializa o objeto para uma string
                 $usuario_serialized = serialize($_SESSION["usuario"]);
 
-                // Agora você pode comparar $categoriaUsuario com $categoria
                 if ($categoriaUsuario != $categoria && $categoria != 'Padrao') {
                     $mensagem = "Você não pode comprar tickets dessa categoria!";
                 } else {
                     session_write_close(); // Fecha a sessão
-                    // Prossiga com a compra
-                    // Redireciona para interface2.php com os valores necessários
+
+                    // Redireciona para interfaceConfirmacao.php
                     header("Location: /es/trabalho-final/interfaceConfirmacao.php?tipo=$tipo&categoria=$categoria&quantidade=$quantidade&usuario_serialized=" . urlencode($usuario_serialized));
-                    exit(); // Certifica-se de que a execução do script é encerrada após o redirecionamento
+                    exit();
                 }
             } else {
-                // Lógica a ser executada se a sessão do usuário não estiver definida
+                // Caso o usuário não esteja definido
                 $mensagem = "Erro: Usuário não definido.";
             }
         }
@@ -157,22 +166,28 @@
 <html>
 <body>
 <h1>Compra de Tickets</h1>
+
+<?php echo '<div>' . alerta($infoUsuario) . '</div>'; ?>
+
+(Para o seu usuário é permitido a categoria: <?php echo $infoUsuario->getCategoria() ?>) <br> <br>
 <p><font color="#AA0000">* campos obrigatórios</font></p>
 <form method="post" action="<?php echo $_SERVER["PHP_SELF"]; ?>">
     <input type="hidden" name="form_submitted" value="1">
-
+    
+    
     Tipo:<font color="#AA0000">*</font>
-    <input type="radio" name="tipo" value="individual" title="Selecione uma opção" required>Individual
-    <input type="radio" name="tipo" value="multiplo" title="Selecione uma opção" required>Múltiplo
-    <input type="radio" name="tipo" value="integrado" title="Selecione uma opção" required>Integrado <br><br>
+    <input type="radio" name="tipo" value="individual" title="Selecione uma opção" required>Individual (R$ 05,00)
+    <input type="radio" name="tipo" value="multiplo" title="Selecione uma opção" required>Múltiplo (R$ 10,00)
+    <input type="radio" name="tipo" value="integrado" title="Selecione uma opção" required>Integrado (R$ 08,20)<br><br>
     Categoria:<font color="#AA0000">*</font>
     <input type="radio" name="categoria" value="Padrao" title="Selecione uma opção" required>Padrão
     <input type="radio" name="categoria" value="Estudante" title="Selecione uma opção" required>Estudante
     <input type="radio" name="categoria" value="Profissional" title="Selecione uma opção" required>Profissional
     <input type="radio" name="categoria" value="Idoso" title="Selecione uma opção" required>Idoso <br><br>
     Quantidade:<font color="#AA0000">*</font> <input type="text" name="quantidade" pattern="[0-9]+" title="Digite apenas números" required> <br><br>
+    (Obs: a categoria Padrao é válida para todos!) <br> <br>
     <input type="submit" value="Avançar"><br> <br>
-    Mensagem: <font color="#AA0000"><?php echo $mensagem;?></font><br> <br>
+    <font color="#AA0000"><?php echo $mensagem;?></font><br> <br>
 
 </form>
 </body>

@@ -1,7 +1,7 @@
 <?php
 class Categoria {
 
-    protected $nome;
+    private $nome;
     private $desconto;
 
     public function __construct($nome, Desconto $desconto) {

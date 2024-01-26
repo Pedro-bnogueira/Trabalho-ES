@@ -15,13 +15,19 @@ class Ticket {
         $this->categoria = $categoria;
         $this->precoFinal();
     }
-    public function getCategoria() {
-        return $this->categoria->getNome();
-    }
+
     public function getId() {
         return $this->id;
     }
 
+    public function getCategoria() {
+        return $this->categoria->getNome();
+    }
+
+    public function getDescontoTicket() {
+        return $this->categoria->getDesconto();
+    }
+    
     public function getValor() {
         return $this->valor;
     }
@@ -32,24 +38,4 @@ class Ticket {
     private function precoFinal() {
         $this->valor = $this->tipo->getPreco() * (1 - $this->categoria->getDesconto());
     }
-
-    // private function definirEstrategia() {
-    //     // Obtém o tipo selecionado
-    //     $select = $_POST['tipoTicket'];
-    //     $tipoSelecionado = $select->value;  
-      
-    //     // Altera o tipo
-    //     switch ($tipoSelecionado) {
-    //       case "integral":
-    //         $this->estrategiaTipo = new TipoTicketIntegrado();
-    //         break;
-    //       case "multiplo":
-    //         $this->estrategiaTipo = new TipoTicketMultiplo();
-    //         break;
-    //       case "individual":
-    //         $this->estrategiaTipo = new TipoTicketIndividual();
-    //         break;
-    //     }
-      
-    //   }
 }

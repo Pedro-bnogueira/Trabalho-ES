@@ -41,33 +41,22 @@
                 }
             }
 
-            function MyConnectionAutoload($className) { // carrega as classes da pasta usuario
-                $extension = '.class.php';
-                $className = str_replace('\\', DIRECTORY_SEPARATOR, $className);
-                $filePath = __DIR__ . '/src/conexao-bd' . $className . $extension;
-
-                if (file_exists($filePath)) {
-                    require_once($filePath);
-                }
-            }
-
             spl_autoload_register('MyTipoAutoload');
             spl_autoload_register('MyCategoriaAutoload');
             spl_autoload_register('MyTicketAutoload');
             spl_autoload_register('MyUsuarioAutoload');
-            spl_autoload_register('MyConnectionAutoload');
 
             // * Variáveis
             $tipo = $categoria = $quantidade = $mensagem = $usuario = "";
 
-            // Verifica se as variáveis estão definidas na URL
+            // Verifica se as variáveis estão vindo na URL
             if (isset($_GET['tipo']) && isset($_GET['categoria']) && isset($_GET['quantidade'])) {
                 // Recupera os valores
                 $tipo = $_GET['tipo'];
                 $categoria = $_GET['categoria'];
                 $quantidade = $_GET['quantidade'];
 
-                // Carrega a classe do usuário (ajuste o caminho conforme necessário)
+                // Carrega a classe do usuário 
                 require_once(__DIR__ . '/src/usuario/Usuario.class.php');
 
                 // Recupera a string serializada do usuário da requisição
@@ -77,7 +66,7 @@
                 $usuario = unserialize(urldecode($usuario_serialized));
             }
 
-            // Criacao do Tipo do Ticket com base no que foi selecionado em interface
+            // Criacao do Tipo do Ticket com base no que foi selecionado em interfaceCompra
             switch ($tipo) {
                 case "integrado":
                     $tipoTicket = new Tipo("integrado", new TipoTicketIntegrado());
@@ -89,11 +78,10 @@
                     $tipoTicket = new Tipo("individual", new TipoTicketIndividual());
                     break;
                 default:
-                    // Trate outros casos conforme necessário
                     break;
             }
 
-            // Criacao da Categoria com base no que foi selecionado em interface
+            // Criacao da Categoria com base no que foi selecionado em interfaceCompra
             switch ($categoria) {
                 case "Padrao":
                     $categoriaTicket = new Categoria("padrao", new DescontoPadrao());
@@ -109,31 +97,32 @@
                 default:
                     break;
             }
-
+             // * Validação
             function test_input($data) {
                 $data = trim ($data);
                 $data = stripslashes ($data);
                 $data = htmlspecialchars ($data);
                 return $data;
             }
-
+            
+            // * Ticket
+            // Criação do ticket conforme as opções selecionadas em interfaceCompra
             $ticket = new Ticket($tipoTicket, $categoriaTicket);
 
-            
-            // $mensagem = $usuario->getNome(); 
-            
-            // Verifica se a solicitação foi feita via POST
             session_start(); // Inicia ou resume a sessão
             
+            // Verifica se os campos foram enviados no formulário atual por meio do botão de confirmação
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                // Confere se o usuário possui saldo suficiente para efetuar a compra
                 if($usuario->getSaldo() >= ($ticket->getValor() * $quantidade)){
+                    // Define o novo saldo do usuário descontando o valor da compra atual
                     $usuario->setSaldo($usuario->getSaldo() - ($ticket->getValor() * $quantidade));
                     $usuario->adicionarTicket($ticket);
                     
-                    // Chama o método save() do objeto $usuario
-                    $mensagem = $usuario->save($quantidade);
+                    // Salva os dados da compra no banco de dados relativo ao usuário específico
+                    $mensagem = 'Seu saldo foi atulizado e agora é de: R$' . $usuario->getSaldo();
 
-                    // Redireciona de volta para a página original com os parâmetros
+                    // Redireciona para uma última página de mensagem de compra confirmada
                     header("Location: /es/trabalho-final/mensagem.php?mensagem=$mensagem");
 
                     exit();
@@ -151,16 +140,16 @@
                 <font color="#AA0000"> Resumo do Pedido: <br><br><br> </font>   
                     Tipo do ticket: <?php echo $ticket->getTipo();?><br><br>
                     Categoria do ticket: <?php echo $ticket->getCategoria();?><br><br>
-                    Quantidade: <?php echo $quantidade;?><br><br>
-                    Preço Final: R$ <?php echo ($ticket->getValor() * $quantidade);?><br><br> <br><br>
+                    Quantidade de tickets: <?php echo $quantidade;?><br><br>
+                    Preço Final: <?php echo $usuario->getCategoria() == 'Idoso' ? 'gratuito' : 'R$ ' . ($ticket->getValor() * $quantidade); ?> (Foi aplicado um desconto de: <?php echo $ticket->getDescontoTicket() * 100?>%)<br><br>
 
                 <!-- Botões de Ação -->
+                <!-- Redireciona o cliente para a primeira interface de seleção de usuário caso cancele a compra -->
                 <a href="http://localhost/es/trabalho-final/interfaceUsuario.php"><button id="cancelarBtn"type="button">Cancelar</button></a>
                 <input id="confirmarBtn" type="submit" value="Confirmar"> <br><br>
 
                 <!-- Exibição da Mensagem -->
-
-                Mensagem: <font color="#AA0000"><?php echo $mensagem;?></font><br> <br>
+                <font color="#AA0000"><?php echo $mensagem;?></font><br> <br>
 
             </form>
 
